@@ -27,9 +27,20 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                SONAR_SCANNER_HOME = tool 'sonar-scanner'
+            }
             steps {
                 withSonarQubeEnv('sonar-server') {   // must match name from step 4
                     sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
