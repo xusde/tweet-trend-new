@@ -32,7 +32,8 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv('sonar-server') {   // must match name from step 4
-                    sh 'mvn sonar:sonar'
+                    // sh 'mvn sonar:sonar'
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
                 }
             }
         }
