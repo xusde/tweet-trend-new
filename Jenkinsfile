@@ -18,65 +18,60 @@ pipeline {
             }
         }
 
-        // stage('Test') {
-        //     steps {
-        //         echo "----------- test started ----------"
-        //         sh 'mvn surefire-report:report'
-        //         echo "----------- test completed ----------"
-        //     }
-        // }
-
-        // stage('SonarQube Analysis') {
-        //     environment {
-        //         SONAR_SCANNER_HOME = tool 'sonar-scanner'
-        //     }
-        //     steps {
-        //         withSonarQubeEnv('sonar-server') {   // must match name from step 4
-        //             sh 'mvn sonar:sonar'
-        //             // sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
-        //         }
-        //     }
-        // }
-
-        // stage('Quality Gate') {
-        //     steps {
-        //         timeout(time: 5, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
-        //         }
-        //     }
-        // }
-
-        stage('Publish to Artifactory') {
+        stage('Test') {
             steps {
-                rtServer (
-                    id: 'artifactory-server',          // configured in Manage Jenkins > System
-                    url: 'https://xusde.jfrog.io/artifactory',
-                    credentialsId: 'jfrog_token'  // Jenkins credentials ID
-                )
-                rtMavenDeployer (
-                    id: 'maven-deployer',
-                    serverId: 'artifactory-server',
-                    releaseRepo: 'libs-release-local',
-                    snapshotRepo: 'libs-snapshot-local'
-                )
-                rtMavenResolver (
-                    id: 'maven-resolver',
-                    serverId: 'artifactory-server',
-                    releaseRepo: 'libs-release',
-                    snapshotRepo: 'libs-snapshot'
-                )
-                rtMavenRun (
-                    // tool: 'maven',              // name of Maven install in Jenkins, or leave blank if on PATH
-                    pom: 'pom.xml',
-                    goals: 'clean install',
-                    deployerId: 'maven-deployer',
-                    resolverId: 'maven-resolver'
-                )
-                rtPublishBuildInfo (
-                    serverId: 'artifactory-server'
-                )
+                echo "----------- test started ----------"
+                sh 'mvn surefire-report:report'
+                echo "----------- test completed ----------"
             }
         }
+
+        stage('SonarQube Analysis') {
+            environment {
+                SONAR_SCANNER_HOME = tool 'sonar-scanner'
+            }
+            steps {
+                withSonarQubeEnv('sonar-server') {   // must match name from step 4
+                    sh 'mvn sonar:sonar'
+                    // sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage("Jar Publish") {
+            steps {
+                script {
+                        def registry = 'https://xusde.jfrog.io'
+                        echo '<--------------- Jar Publish Started --------------->'
+                        def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jfrog_token"
+                        def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
+                        def uploadSpec = """{
+                            "files": [
+                                {
+                                "pattern": "jarstaging/(*)",
+                                "target": "libs-release-local/{1}",
+                                "flat": "false",
+                                "props" : "${properties}",
+                                "exclusions": [ "*.sha1", "*.md5"]
+                                }
+                            ]
+                        }"""
+                        def buildInfo = server.upload(uploadSpec)
+                        buildInfo.env.collect()
+                        server.publishBuildInfo(buildInfo)
+                        echo '<--------------- Jar Publish Ended --------------->'  
+                
+                }
+            }   
+        }   
 
     }
 }
