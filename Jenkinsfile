@@ -51,7 +51,7 @@ pipeline {
                 script {
                         def registry = 'https://xusde.jfrog.io'
                         echo '<--------------- Jar Publish Started --------------->'
-                        def server = Artifactory.newServer url: registry + "/artifactory", credentialsId: "jfrog-artifactory-token"
+                        def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jfrog_token"
                         def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
                         def uploadSpec = """{
                             "files": [
