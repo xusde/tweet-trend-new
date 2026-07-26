@@ -1,5 +1,3 @@
-FROM eclipse-temurin:8-jre
-WORKDIR /app
-COPY target/demo-workshop-2.1.2.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+	FROM eclipse-temurin:21-jre-jammy
+	ADD jarstaging/com/valaxy/demo-workshop/2.1.2/demo-workshop-2.1.2.jar demo-workshop.jar
+	ENTRYPOINT ["java", "-jar", "demo-workshop.jar"]
