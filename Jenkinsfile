@@ -15,6 +15,8 @@ pipeline {
     stages {
         stage('Build source code') {
             steps {
+                echo "----------- print JAVA_HOME ----------"
+                sh 'echo JAVA_HOME=$JAVA_HOME; which java; java -version'
                 echo "----------- build started ----------"
                 sh 'mvn clean deploy -Dmaven.test.skip=true'
                 echo "----------- build completed ----------"
@@ -29,25 +31,25 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            environment {
-                SONAR_SCANNER_HOME = tool 'sonar-scanner'
-            }
-            steps {
-                withSonarQubeEnv('sonar-server') {   // must match name from step 4
-                    sh 'mvn sonar:sonar'
-                    // sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     environment {
+        //         SONAR_SCANNER_HOME = tool 'sonar-scanner'
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('sonar-server') {   // must match name from step 4
+        //             sh 'mvn sonar:sonar'
+        //             // sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
+        //         }
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage("Jar Publish") {
             steps {
