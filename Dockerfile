@@ -1,3 +1,4 @@
 	FROM eclipse-temurin:21-jre-jammy
-	ADD jarstaging/com/valaxy/demo-workshop/2.1.2/demo-workshop-2.1.2.jar demo-workshop.jar
+	ARG APP_VERSION
+	ADD jarstaging/com/valaxy/demo-workshop/${APP_VERSION}/demo-workshop-${APP_VERSION}.jar demo-workshop.jar
 	ENTRYPOINT ["java", "-jar", "demo-workshop.jar"]

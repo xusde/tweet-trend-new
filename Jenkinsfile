@@ -83,7 +83,7 @@ pipeline {
             steps {
                 script {
                 echo '<--------------- Docker Build Started --------------->'
-                app = docker.build(imageName+":"+version)
+                app = docker.build(imageName+":"+version, "--build-arg APP_VERSION="+version+" .")
                 echo '<--------------- Docker Build Ends --------------->'
                 }
             }
