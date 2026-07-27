@@ -1,4 +1,5 @@
 #!/bin/sh
+cd "$(dirname "$0")"
 kubectl apply -f namespace.yaml
 kubectl apply -f secret.yaml
 kubectl apply -f deployment.yaml
