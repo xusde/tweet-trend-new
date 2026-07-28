@@ -105,7 +105,7 @@ pipeline {
             steps {
                 script {
                     echo '<--------------- Deploy to Kubernetes Started --------------->'  
-                    sh 'bash kubernetes/deploy.sh'
+                    sh 'helm install ttrend ttrend-0.1.0.tgz'
                     echo '<--------------- Deploy to Kubernetes Ended --------------->'  
                 }
             }
