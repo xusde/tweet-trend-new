@@ -1,6 +1,6 @@
 def registry = 'https://xusde.jfrog.io'
 def imageName = 'xusde.jfrog.io/sample-docker-local/ttrend'
-def version   = '2.1.3'
+def version   = '2.1.2'
 pipeline {
     agent {
         node {
